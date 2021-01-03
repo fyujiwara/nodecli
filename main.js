@@ -5,12 +5,18 @@ const fs = require("fs");
 // markedモジュールをmarkedオブジェクトとしてインポートする
 const marked = require("marked");
 
+// gfmオプションを定義する
+program.option("--gfm", "GFMを有効にする", false)
 // コマンドライン引数をcommanderでパースする
 program.parse(process.argv);
 
 // ファイルパスをprogram.args配列から取り出す
 const filePath = program.args[0];
-console.log(filePath);
+
+// コマンドライン引数のオプションを取得し、デフォルトのオプションを上書きする
+const cliOptions = {
+    ...program.opts(),
+};
 
 // ファイルをUTF-8として非同期で読み込む
 fs.readFile(filePath, { encoding: "utf8" }, (err, file) => {
@@ -20,8 +26,10 @@ fs.readFile(filePath, { encoding: "utf8" }, (err, file) => {
         process.exit(1);
         return;
     }
-    console.log(file);
     // MarkdownファイルをHTML文字列に変換する
-    const html = marked(file);
+    const html = marked(file, {
+        // オプションの値を使用する
+        gfm: cliOptions.gfm,
+    });
     console.log(html);
 });
